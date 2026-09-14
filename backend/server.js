@@ -16,7 +16,7 @@ const jwtVerifier = CognitoJwtVerifier.create({
 });
 
 const {
-  DB_HOST = process.env.DB_HOST || "tienda-db", // acá resuelve internamente en eks
+  DB_HOST = process.env.DB_HOST || "localhost",
   DB_USER = "root",
   DB_PASSWORD = "admin123",
   DB_NAME = "tienda_perritos",
