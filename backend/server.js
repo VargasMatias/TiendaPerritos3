@@ -1,9 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2/promise");
+const { CognitoJwtVerifier } = require("aws-jwt-verify");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+const COGNITO_USER_POOL_ID = process.env.COGNITO_USER_POOL_ID;
+const COGNITO_CLIENT_ID = process.env.COGNITO_CLIENT_ID;
+
+const jwtVerifier = CognitoJwtVerifier.create({
+  userPoolId: COGNITO_USER_POOL_ID,
+  tokenUse: "access",
+  clientId: COGNITO_CLIENT_ID,
+});
 
 const {
   DB_HOST = process.env.DB_HOST || "tienda-db", // acá resuelve internamente en eks
@@ -42,9 +52,43 @@ function handleError(res, error, message = "Error interno del servidor") {
   console.error(error);
   res.status(500).json({ message });
 }
+// Middleware para validar el Access Token JWT de Cognito
+async function autenticar(req, res, next) {
+  const auth = req.headers.authorization || "";
 
+  if (!auth.startsWith("Bearer ")) {
+    return res.status(401).json({
+      message: "Token requerido."
+    });
+  }
+
+  const token = auth.slice(7);
+
+  try {
+    req.user = await jwtVerifier.verify(token);
+    next();
+  } catch (error) {
+    console.error("JWT inválido:", error);
+
+    return res.status(401).json({
+      message: "Token inválido o expirado."
+    });
+  }
+}
+// Middleware para permitir únicamente usuarios del grupo Admin
+function soloAdmin(req, res, next) {
+  const groups = req.user["cognito:groups"] || [];
+
+  if (!groups.includes("Admin")) {
+    return res.status(403).json({
+      message: "Acceso reservado para Admin."
+    });
+  }
+
+  next();
+}
 // Obtener todos los productos
-app.get("/api/productos", async (req, res) => {
+app.get("/api/productos", autenticar, async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT id, nombre, descripcion, precio, stock FROM productos ORDER BY id DESC");
     res.json(rows);
@@ -54,7 +98,7 @@ app.get("/api/productos", async (req, res) => {
 });
 
 // Obtener un producto por ID
-app.get("/api/productos/:id", async (req, res) => {
+app.get("/api/productos/:id", autenticar, async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await pool.query("SELECT id, nombre, descripcion, precio, stock FROM productos WHERE id = ?", [id]);
@@ -68,7 +112,7 @@ app.get("/api/productos/:id", async (req, res) => {
 });
 
 // Crear un nuevo producto
-app.post("/api/productos", async (req, res) => {
+app.post("/api/productos", autenticar, soloAdmin, async (req, res) => {
   const { nombre, descripcion, precio, stock } = req.body;
 
   if (!nombre || precio == null || stock == null) {
@@ -89,7 +133,7 @@ app.post("/api/productos", async (req, res) => {
 });
 
 // Actualizar un producto
-app.put("/api/productos/:id", async (req, res) => {
+app.put("/api/productos/:id", autenticar, soloAdmin, async (req, res) => {
   const { id } = req.params;
   const { nombre, descripcion, precio, stock } = req.body;
 
@@ -115,7 +159,7 @@ app.put("/api/productos/:id", async (req, res) => {
 });
 
 // Eliminar un producto
-app.delete("/api/productos/:id", async (req, res) => {
+app.delete("/api/productos/:id", autenticar, soloAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const [result] = await pool.query("DELETE FROM productos WHERE id = ?", [id]);
