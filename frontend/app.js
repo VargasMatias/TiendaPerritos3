@@ -19,7 +19,8 @@ const SCOPES = [
   "https://api.tiendaperritos.com/mascotas.write",
 ].join(" ");
 
-const API_BASE = "/api/productos";
+
+const API_BASE = "http://localhost:3001/api/productos";
 
 const STORAGE = {
   accessToken: "tienda_access_token",
