@@ -9,7 +9,7 @@ const COGNITO_DOMAIN =
 
 const CLIENT_ID = "60eknr7re3q27nlj181vdmi0cg";
 
-const REDIRECT_URI = window.location.origin;
+const REDIRECT_URI = window.location.origin + "/index.html";
 
 const SCOPES = [
   "openid",
