@@ -3,8 +3,11 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Tienda de Alimentos para Perritos &#128054;</title>
+
+  <title>Tienda de Alimentos para Perritos 🐶</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -100,7 +103,7 @@
     }
 
     .status {
-      margin-top: 10px;
+      margin-top: 15px;
       font-size: 0.9rem;
     }
 
@@ -111,72 +114,197 @@
     .status.error {
       color: #dc2626;
     }
+
+    /*
+      El formulario comienza oculto.
+      app.js lo mostrará solamente si el usuario pertenece
+      al grupo Admin de Cognito.
+    */
+    #adminForm {
+      display: none;
+      margin-top: 24px;
+    }
   </style>
 </head>
 
 <body>
+
   <header>
-    <h1>Tienda de Alimentos para Perritos &#128054;</h1>
-    <p>Gestión CRUD de productos en contenedores Docker (Frontend + Backend + MySQL)</p>
+
+    <h1>
+      Tienda de Alimentos para Perritos 🐶
+    </h1>
+
+    <p>
+      Aplicación Cloud Native
+      (S3 + Cognito + API Gateway + EC2 + RDS)
+    </p>
 
     <div style="margin-top: 15px;">
-      <span id="authStatus">No autenticado</span>
-      <button id="btnLogin">Iniciar sesión</button>
-      <button id="btnLogout" style="display:none;">Cerrar sesión</button>
+
+      <span id="authStatus">
+        No autenticado
+      </span>
+
+      <button id="btnLogin">
+        Iniciar sesión
+      </button>
+
+      <button id="btnLogout" style="display: none;">
+        Cerrar sesión
+      </button>
+
     </div>
+
   </header>
+
+
   <main>
-    <section>
-      <h2>Productos</h2>
-      <div class="actions">
-        <button id="btnCargar">Cargar Productos</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Stock</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyProductos">
-          <!-- Aqu�� se insertan filas dinamicamente -->
-        </tbody>
-      </table>
-    </section>
+
+    <!-- ============================= -->
+    <!-- PRODUCTOS -->
+    <!-- ============================= -->
 
     <section>
-      <h2 id="formTitle">Nuevo producto</h2>
-      <div class="form-grid">
-        <div>
-          <label for="nombre">Nombre</label>
-          <input type="text" id="nombre" placeholder="Ej: Alimento Premium Cachorro" />
-        </div>
-        <div>
-          <label for="descripcion">Descripción</label>
-          <textarea id="descripcion" rows="2" placeholder="Ej: Sabor pollo, razas pequeñas"></textarea>
-        </div>
-        <div>
-          <label for="precio">Precio</label>
-          <input type="number" id="precio" step="0.01" min="0" placeholder="Ej: 19990" />
-        </div>
-        <div>
-          <label for="stock">Stock</label>
-          <input type="number" id="stock" min="0" placeholder="Ej: 10" />
-        </div>
+
+      <h2>Productos</h2>
+
+      <div class="actions">
+
+        <button id="btnCargar">
+          Cargar Productos
+        </button>
+
       </div>
-      <div class="actions" style="margin-top: 12px;">
-        <button id="btnGuardar">Guardar</button>
-        <button id="btnCancelar" class="secondary">Cancelar</button>
-      </div>
-      <div id="status" class="status"></div>
+
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Nombre</th>
+
+            <th>Descripción</th>
+
+            <th>Precio</th>
+
+            <th>Stock</th>
+
+            <th>Acciones</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody id="tbodyProductos">
+
+          <!--
+            Las filas se crean dinámicamente
+            desde app.js
+          -->
+
+        </tbody>
+
+      </table>
+
     </section>
+
+
+    <!-- ============================= -->
+    <!-- FORMULARIO SOLO PARA ADMIN -->
+    <!-- ============================= -->
+
+    <section>
+
+      <div id="adminForm">
+
+        <h2 id="formTitle">
+          Nuevo producto
+        </h2>
+
+
+        <div class="form-grid">
+
+          <div>
+
+            <label for="nombre">
+              Nombre
+            </label>
+
+            <input type="text" id="nombre" placeholder="Ej: Alimento Premium Cachorro" />
+
+          </div>
+
+
+          <div>
+
+            <label for="descripcion">
+              Descripción
+            </label>
+
+            <textarea id="descripcion" rows="2" placeholder="Ej: Sabor pollo, razas pequeñas"></textarea>
+
+          </div>
+
+
+          <div>
+
+            <label for="precio">
+              Precio
+            </label>
+
+            <input type="number" id="precio" step="0.01" min="0" placeholder="Ej: 19990" />
+
+          </div>
+
+
+          <div>
+
+            <label for="stock">
+              Stock
+            </label>
+
+            <input type="number" id="stock" min="0" placeholder="Ej: 10" />
+
+          </div>
+
+        </div>
+
+
+        <div class="actions" style="margin-top: 12px;">
+
+          <button id="btnGuardar">
+            Guardar
+          </button>
+
+          <button id="btnCancelar" class="secondary">
+            Cancelar
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!--
+        IMPORTANTE:
+        status queda fuera de adminForm
+        para que Cliente también pueda ver mensajes.
+      -->
+
+      <div id="status" class="status"></div>
+
+    </section>
+
   </main>
 
+
   <script src="app.js"></script>
+
 </body>
 
 </html>
