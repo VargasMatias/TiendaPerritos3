@@ -9,7 +9,7 @@ const COGNITO_DOMAIN =
 
 const CLIENT_ID = "60eknr7re3q27nlj181vdmi0cg";
 
-const REDIRECT_URI = "http://localhost:4200";
+const REDIRECT_URI = window.location.origin;
 
 const SCOPES = [
   "openid",
@@ -20,7 +20,7 @@ const SCOPES = [
 ].join(" ");
 
 
-const API_BASE = "http://localhost:3001/api/productos";
+const API_BASE = "https://uutkg86tzd.execute-api.us-east-1.amazonaws.com/api/productos";
 
 const STORAGE = {
   accessToken: "tienda_access_token",
