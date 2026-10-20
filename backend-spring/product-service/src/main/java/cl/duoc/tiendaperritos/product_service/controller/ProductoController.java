@@ -1,7 +1,7 @@
-package cl.duoc.tiendaperritos.productservice.controller;
+package cl.duoc.tiendaperritos.product_service.controller;
 
-import cl.duoc.tiendaperritos.productservice.model.Producto;
-import cl.duoc.tiendaperritos.productservice.service.ProductoService;
+import cl.duoc.tiendaperritos.product_service.model.Producto;
+import cl.duoc.tiendaperritos.product_service.service.ProductoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
-package cl.duoc.tiendaperritos.productservice.service;
+package cl.duoc.tiendaperritos.product_service.service;
 
-import cl.duoc.tiendaperritos.productservice.model.Producto;
-import cl.duoc.tiendaperritos.productservice.repository.ProductoRepository;
+import cl.duoc.tiendaperritos.product_service.model.Producto;
+import cl.duoc.tiendaperritos.product_service.repository.ProductoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

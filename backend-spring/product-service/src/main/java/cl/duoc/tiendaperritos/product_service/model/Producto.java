@@ -1,4 +1,4 @@
-package cl.duoc.tiendaperritos.productservice.model;
+package cl.duoc.tiendaperritos.product_service.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
