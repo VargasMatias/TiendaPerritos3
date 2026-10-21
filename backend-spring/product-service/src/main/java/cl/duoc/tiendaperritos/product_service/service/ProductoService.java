@@ -1,7 +1,9 @@
 package cl.duoc.tiendaperritos.product_service.service;
 
+import cl.duoc.tiendaperritos.product_service.messaging.ProductoEventPublisher;
 import cl.duoc.tiendaperritos.product_service.model.Producto;
 import cl.duoc.tiendaperritos.product_service.repository.ProductoRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -12,17 +14,28 @@ import java.util.List;
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final ProductoEventPublisher productoEventPublisher;
 
-    public ProductoService(ProductoRepository productoRepository) {
+
+    public ProductoService(
+            ProductoRepository productoRepository,
+            ProductoEventPublisher productoEventPublisher) {
+
         this.productoRepository = productoRepository;
+        this.productoEventPublisher = productoEventPublisher;
     }
 
+
     public List<Producto> listarTodos() {
+
         return productoRepository.findAll();
     }
 
+
     public Producto buscarPorId(Integer id) {
-        return productoRepository.findById(id)
+
+        return productoRepository
+                .findById(id)
                 .orElseThrow(() ->
                         new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,
@@ -31,12 +44,23 @@ public class ProductoService {
                 );
     }
 
+
     public Producto crear(Producto producto) {
+
         producto.setId(null);
-        return productoRepository.save(producto);
+
+        Producto creado =
+                productoRepository.save(producto);
+
+        productoEventPublisher.publicarCreado(creado);
+
+        return creado;
     }
 
-    public Producto actualizar(Integer id, Producto datos) {
+
+    public Producto actualizar(
+            Integer id,
+            Producto datos) {
 
         Producto producto = buscarPorId(id);
 
@@ -45,18 +69,23 @@ public class ProductoService {
         producto.setPrecio(datos.getPrecio());
         producto.setStock(datos.getStock());
 
-        return productoRepository.save(producto);
+        Producto actualizado =
+                productoRepository.save(producto);
+
+        productoEventPublisher
+                .publicarActualizado(actualizado);
+
+        return actualizado;
     }
+
 
     public void eliminar(Integer id) {
 
-        if (!productoRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Producto no encontrado"
-            );
-        }
+        Producto producto = buscarPorId(id);
 
-        productoRepository.deleteById(id);
+        productoRepository.delete(producto);
+
+        productoEventPublisher
+                .publicarEliminado(producto);
     }
 }

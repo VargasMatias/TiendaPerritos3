@@ -1,0 +1,35 @@
+spring:
+  rabbitmq:
+    addresses: ${RABBITMQ_ADDRESSES}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    dynamic: true
+
+    listener:
+      simple:
+        acknowledge-mode: manual
+app:
+  rabbit:
+    exchanges:
+      direct: productos.direct
+      topic: productos.topic
+      dlx: productos.dlx
+
+    queues:
+      notifications: notifications.queue
+      audit: audit.queue
+      documents: documents.queue
+      notifications-dlq: notifications.dlq
+      audit-dlq: audit.dlq
+      documents-dlq: documents.dlq
+
+    routing-keys:
+      notification: producto.created
+      updated: producto.updated
+      deleted: producto.deleted
+      audit: producto.*
+      document: producto.document
+
+      notifications-dead: notifications.dead
+      audit-dead: audit.dead
+      documents-dead: documents.dead
