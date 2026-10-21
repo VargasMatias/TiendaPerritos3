@@ -1,0 +1,218 @@
+<div class="pagina">
+
+    <header>
+
+        <div>
+            <h1>🐶 TiendaPerritos</h1>
+            <p>Catálogo de productos</p>
+        </div>
+
+        <div class="sesion">
+
+            <strong>
+                @if (esAdmin) {
+                Administrador
+                } @else {
+                Cliente
+                }
+            </strong>
+
+            <button type="button" (click)="cerrarSesion()">
+                Cerrar sesión
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        @if (esAdmin) {
+
+        <section class="formulario">
+
+            <h2>Crear producto</h2>
+
+            <input type="text" placeholder="Nombre" [(ngModel)]="nuevoProducto.nombre">
+
+            <input type="text" placeholder="Descripción" [(ngModel)]="nuevoProducto.descripcion">
+
+            <input type="number" placeholder="Precio" [(ngModel)]="nuevoProducto.precio">
+
+            <input type="number" placeholder="Stock" [(ngModel)]="nuevoProducto.stock">
+
+            <button type="button" (click)="crearProducto()">
+                Crear producto
+            </button>
+
+        </section>
+
+        }
+
+
+        @if (mensaje) {
+
+        <p class="mensaje">
+            {{ mensaje }}
+        </p>
+
+        }
+
+
+        @if (error) {
+
+        <p class="error">
+            {{ error }}
+        </p>
+
+        }
+
+
+        <h2>Productos disponibles</h2>
+
+
+        @if (cargando) {
+
+        <p>
+            Cargando productos...
+        </p>
+
+        } @else {
+
+        <div class="tabla-contenedor">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+
+                        @if (esAdmin) {
+                        <th>Acciones</th>
+                        }
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @for (
+                    producto of productos;
+                    track producto.id
+                    ) {
+
+                    <tr>
+
+                        @if (
+                        editandoId === producto.id
+                        ) {
+
+                        <td>
+                            {{ producto.id }}
+                        </td>
+
+                        <td>
+                            <input [(ngModel)]="
+                        productoEditando.nombre
+                      ">
+                        </td>
+
+                        <td>
+                            <input [(ngModel)]="
+                        productoEditando.descripcion
+                      ">
+                        </td>
+
+                        <td>
+                            <input type="number" [(ngModel)]="
+                        productoEditando.precio
+                      ">
+                        </td>
+
+                        <td>
+                            <input type="number" [(ngModel)]="
+                        productoEditando.stock
+                      ">
+                        </td>
+
+                        <td>
+
+                            <button type="button" (click)="guardarEdicion(
+                        producto.id!
+                      )">
+                                Guardar
+                            </button>
+
+                            <button type="button" (click)="cancelarEdicion()">
+                                Cancelar
+                            </button>
+
+                        </td>
+
+                        } @else {
+
+                        <td>
+                            {{ producto.id }}
+                        </td>
+
+                        <td>
+                            {{ producto.nombre }}
+                        </td>
+
+                        <td>
+                            {{ producto.descripcion }}
+                        </td>
+
+                        <td>
+                            ${{ producto.precio }}
+                        </td>
+
+                        <td>
+                            {{ producto.stock }}
+                        </td>
+
+                        @if (esAdmin) {
+
+                        <td>
+
+                            <button type="button" (click)="comenzarEdicion(
+                          producto
+                        )">
+                                Editar
+                            </button>
+
+                            <button type="button" (click)="eliminarProducto(
+                          producto
+                        )">
+                                Eliminar
+                            </button>
+
+                        </td>
+
+                        }
+
+                        }
+
+                    </tr>
+
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        }
+
+    </main>
+
+</div>

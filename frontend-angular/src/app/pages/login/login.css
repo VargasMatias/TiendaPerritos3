@@ -1,0 +1,56 @@
+:host {
+    display: block;
+}
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f6f8;
+    font-family: Arial, sans-serif;
+}
+
+.login-card {
+    width: 360px;
+    padding: 40px;
+    background: white;
+    border-radius: 16px;
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.12);
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+p {
+    color: #555;
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    background: #222;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.error {
+    margin-top: 20px;
+    color: #c62828;
+}

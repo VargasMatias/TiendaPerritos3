@@ -3,93 +3,209 @@ package cl.duoc.tiendaperritos.product_service.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.http.HttpMethod;
+
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
 import org.springframework.security.web.SecurityFilterChain;
+
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
 @Configuration
 public class SecurityConfig {
 
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
         http
-            .csrf(AbstractHttpConfigurer::disable)
+
+            .csrf(csrf ->
+                csrf.disable()
+            )
+
+            .cors(
+                Customizer.withDefaults()
+            )
 
             .authorizeHttpRequests(auth -> auth
 
-                // Health check público
-                .requestMatchers("/actuator/health").permitAll()
-
-                // Lectura: cualquier usuario autenticado
+                // Permitir preflight CORS
                 .requestMatchers(
-                        org.springframework.http.HttpMethod.GET,
-                        "/api/productos/**"
-                ).authenticated()
-
-                // Escritura: solamente Admin
-                .requestMatchers(
-                        org.springframework.http.HttpMethod.POST,
-                        "/api/productos/**"
-                ).hasRole("Admin")
-
-                .requestMatchers(
-                        org.springframework.http.HttpMethod.PUT,
-                        "/api/productos/**"
-                ).hasRole("Admin")
-
-                .requestMatchers(
-                        org.springframework.http.HttpMethod.DELETE,
-                        "/api/productos/**"
-                ).hasRole("Admin")
-
-                .anyRequest().authenticated()
-            )
-
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                    .jwtAuthenticationConverter(cognitoJwtConverter())
+                    HttpMethod.OPTIONS,
+                    "/**"
                 )
+                .permitAll()
+
+                // Health público
+                .requestMatchers(
+                    "/actuator/health"
+                )
+                .permitAll()
+
+                // Cliente y Admin pueden leer productos
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/productos/**"
+                )
+                .authenticated()
+
+                // Solo Admin puede crear
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/productos/**"
+                )
+                .hasRole("Admin")
+
+                // Solo Admin puede modificar
+                .requestMatchers(
+                    HttpMethod.PUT,
+                    "/api/productos/**"
+                )
+                .hasRole("Admin")
+
+                // Solo Admin puede eliminar
+                .requestMatchers(
+                    HttpMethod.DELETE,
+                    "/api/productos/**"
+                )
+                .hasRole("Admin")
+
+                .anyRequest()
+                .authenticated()
             )
 
-            .formLogin(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable);
+            .oauth2ResourceServer(
+                oauth2 ->
+                    oauth2.jwt(
+                        jwt ->
+                            jwt.jwtAuthenticationConverter(
+                                jwtAuthenticationConverter()
+                            )
+                    )
+            );
 
         return http.build();
     }
 
+
     @Bean
-    public Converter<Jwt, AbstractAuthenticationToken> cognitoJwtConverter() {
+    public JwtAuthenticationConverter
+    jwtAuthenticationConverter() {
 
-        return jwt -> {
+        JwtGrantedAuthoritiesConverter
+            scopeConverter =
+                new JwtGrantedAuthoritiesConverter();
 
-            Collection<GrantedAuthority> authorities = new ArrayList<>();
+        Converter<
+            Jwt,
+            Collection<GrantedAuthority>
+        > authoritiesConverter =
+            jwt -> {
 
-            List<String> groups = jwt.getClaimAsStringList("cognito:groups");
+                Collection<GrantedAuthority>
+                    authorities =
+                        new ArrayList<>();
 
-            if (groups != null) {
-                for (String group : groups) {
-                    authorities.add(
-                        new SimpleGrantedAuthority("ROLE_" + group)
-                    );
+                Collection<GrantedAuthority>
+                    scopes =
+                        scopeConverter.convert(jwt);
+
+                if (scopes != null) {
+                    authorities.addAll(scopes);
                 }
-            }
 
-            return new JwtAuthenticationToken(
-                    jwt,
-                    authorities,
-                    jwt.getSubject()
-            );
-        };
+                List<String> grupos =
+                    jwt.getClaimAsStringList(
+                        "cognito:groups"
+                    );
+
+                if (grupos != null) {
+
+                    for (String grupo : grupos) {
+
+                        authorities.add(
+                            new SimpleGrantedAuthority(
+                                "ROLE_" + grupo
+                            )
+                        );
+                    }
+                }
+
+                return authorities;
+            };
+
+
+        JwtAuthenticationConverter converter =
+            new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(
+            authoritiesConverter
+        );
+
+        return converter;
+    }
+
+
+    @Bean
+    public CorsConfigurationSource
+    corsConfigurationSource() {
+
+        CorsConfiguration configuration =
+            new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+            List.of(
+                "http://localhost:4200"
+            )
+        );
+
+        configuration.setAllowedMethods(
+            List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS"
+            )
+        );
+
+        configuration.setAllowedHeaders(
+            List.of(
+                "Authorization",
+                "Content-Type"
+            )
+        );
+
+        configuration.setAllowCredentials(
+            true
+        );
+
+
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+            "/**",
+            configuration
+        );
+
+        return source;
     }
 }
