@@ -1,4 +1,25 @@
 spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:19092,localhost:19093,localhost:19094}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      acks: all
+      properties:
+        "[enable.idempotence]": true
+        "[spring.json.add.type.headers]": false
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        "[spring.json.value.default.type]": "cl.duoc.tiendaperritos.product_service.kafka.dto.ProductoEventoDto"
+        "[spring.json.trusted.packages]": "cl.duoc.tiendaperritos.product_service.kafka.dto"
+        "[spring.json.use.type.headers]": false
+
+    listener:
+      ack-mode: record
   rabbitmq:
     addresses: ${RABBITMQ_ADDRESSES}
     username: ${RABBITMQ_USER}
@@ -9,6 +30,10 @@ spring:
       simple:
         acknowledge-mode: manual
 app:
+  kafka:
+    topics:
+      eventos: productos.eventos
+      auditoria: productos.auditoria
   rabbit:
     exchanges:
       direct: productos.direct

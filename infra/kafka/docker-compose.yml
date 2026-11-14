@@ -1,0 +1,130 @@
+# TiendaPerritos3 - EP5
+# 3 ZooKeeper + 3 Kafka brokers + Kafka UI
+
+x-zk-env: &zk-env
+  ZOOKEEPER_CLIENT_PORT: "2181"
+  ZOOKEEPER_TICK_TIME: "2000"
+  ZOOKEEPER_INIT_LIMIT: "10"
+  ZOOKEEPER_SYNC_LIMIT: "5"
+  ZOOKEEPER_SERVERS: "zk1:2888:3888;zk2:2888:3888;zk3:2888:3888"
+  KAFKA_HEAP_OPTS: "-Xms128m -Xmx256m"
+
+x-kafka-env: &kafka-env
+  KAFKA_ZOOKEEPER_CONNECT: "zk1:2181,zk2:2181,zk3:2181"
+  KAFKA_LISTENERS: "INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092"
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+  KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "3"
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "3"
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "2"
+  KAFKA_DEFAULT_REPLICATION_FACTOR: "3"
+  KAFKA_MIN_INSYNC_REPLICAS: "2"
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+  KAFKA_LOG_RETENTION_HOURS: "24"
+  KAFKA_HEAP_OPTS: "-Xms256m -Xmx640m"
+
+services:
+  zk1:
+    image: confluentinc/cp-zookeeper:7.9.10
+    hostname: zk1
+    restart: unless-stopped
+    mem_limit: 430m
+    environment:
+      <<: *zk-env
+      ZOOKEEPER_SERVER_ID: "1"
+    volumes:
+      - zk1-data:/var/lib/zookeeper/data
+      - zk1-log:/var/lib/zookeeper/log
+
+  zk2:
+    image: confluentinc/cp-zookeeper:7.9.10
+    hostname: zk2
+    restart: unless-stopped
+    mem_limit: 430m
+    environment:
+      <<: *zk-env
+      ZOOKEEPER_SERVER_ID: "2"
+    volumes:
+      - zk2-data:/var/lib/zookeeper/data
+      - zk2-log:/var/lib/zookeeper/log
+
+  zk3:
+    image: confluentinc/cp-zookeeper:7.9.10
+    hostname: zk3
+    restart: unless-stopped
+    mem_limit: 430m
+    environment:
+      <<: *zk-env
+      ZOOKEEPER_SERVER_ID: "3"
+    volumes:
+      - zk3-data:/var/lib/zookeeper/data
+      - zk3-log:/var/lib/zookeeper/log
+
+  kafka1:
+    image: confluentinc/cp-kafka:7.9.10
+    hostname: kafka1
+    restart: unless-stopped
+    mem_limit: 1200m
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      <<: *kafka-env
+      KAFKA_BROKER_ID: "1"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka1:29092,EXTERNAL://localhost:19092"
+    ports:
+      - "127.0.0.1:19092:9092"
+    volumes:
+      - kafka1-data:/var/lib/kafka/data
+
+  kafka2:
+    image: confluentinc/cp-kafka:7.9.10
+    hostname: kafka2
+    restart: unless-stopped
+    mem_limit: 1200m
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      <<: *kafka-env
+      KAFKA_BROKER_ID: "2"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka2:29092,EXTERNAL://localhost:19093"
+    ports:
+      - "127.0.0.1:19093:9092"
+    volumes:
+      - kafka2-data:/var/lib/kafka/data
+
+  kafka3:
+    image: confluentinc/cp-kafka:7.9.10
+    hostname: kafka3
+    restart: unless-stopped
+    mem_limit: 1200m
+    depends_on: [zk1, zk2, zk3]
+    environment:
+      <<: *kafka-env
+      KAFKA_BROKER_ID: "3"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka3:29092,EXTERNAL://localhost:19094"
+    ports:
+      - "127.0.0.1:19094:9092"
+    volumes:
+      - kafka3-data:/var/lib/kafka/data
+
+  kafka-ui:
+    image: ghcr.io/kafbat/kafka-ui:v1.5.0
+    hostname: kafka-ui
+    restart: unless-stopped
+    mem_limit: 850m
+    depends_on: [kafka1, kafka2, kafka3]
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "TiendaPerritos3-EP5"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka1:29092,kafka2:29092,kafka3:29092"
+      JAVA_OPTS: "-Xms128m -Xmx512m"
+    ports:
+      - "127.0.0.1:8080:8080"
+
+volumes:
+  zk1-data:
+  zk1-log:
+  zk2-data:
+  zk2-log:
+  zk3-data:
+  zk3-log:
+  kafka1-data:
+  kafka2-data:
+  kafka3-data:
