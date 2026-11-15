@@ -1,0 +1,4 @@
+cl\duoc\tiendaperritos\kafkaadmin\KafkaAdminServiceApplication.class
+cl\duoc\tiendaperritos\kafkaadmin\controller\KafkaAdminController$CrearTopicoRequest.class
+cl\duoc\tiendaperritos\kafkaadmin\controller\KafkaAdminController.class
+cl\duoc\tiendaperritos\kafkaadmin\controller\KafkaAdminController$RetencionRequest.class

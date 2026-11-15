@@ -50,6 +50,23 @@ public class KafkaPruebaApplication {
             producer.publicarEvento(evento);
             producer.publicarAuditoria(evento);
 
+            ProductoEventoDto eventoInvalido = new ProductoEventoDto(
+                "",
+                9002L,
+                "Producto Invalido EP5",
+                "Prueba de reintentos y DLT",
+                new BigDecimal("15990"),
+                10,
+                OffsetDateTime.now().toString()
+            );
+
+            producer.publicarEvento(eventoInvalido);
+
+            System.out.println(
+                "[KAFKA-DEMO] Envio solicitado de evento invalido ID 9002"
+            );
+
+
             System.out.println(
                 "[KAFKA-DEMO] Publicacion solicitada en ambos topicos"
             );
