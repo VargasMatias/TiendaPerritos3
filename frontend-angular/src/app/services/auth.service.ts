@@ -5,17 +5,19 @@ import { Injectable } from '@angular/core';
 })
 export class AuthService {
 
+
     private readonly domain =
-        'https://tiendaperritos-auth.auth.us-east-1.amazoncognito.com';
+        'https://us-east-1mrjqmy61j.auth.us-east-1.amazoncognito.com';
 
     private readonly clientId =
-        '60eknr7re3q27nlj181vdmi0cg';
+        'k8bjsh3eem7jd11180kepd9qb';
 
     private readonly redirectUri =
         'http://localhost:4200';
 
     private readonly scopes =
         'openid email profile';
+
 
 
     async login(): Promise<void> {
