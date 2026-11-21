@@ -133,4 +133,25 @@ public class RabbitAdminController {
                         )
                 );
     }
+
+        @DeleteMapping("/bindings")
+        public ResponseEntity<?> eliminarBinding(
+                @Valid @RequestBody BindingRequest request) {
+
+        rabbitAdminService.eliminarBinding(request);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "mensaje",
+                        "Solicitud de eliminación de binding procesada",
+                        "exchange",
+                        request.exchange(),
+                        "queue",
+                        request.queue(),
+                        "routingKey",
+                        request.routingKey()
+                )
+        );
+        }
+
 }

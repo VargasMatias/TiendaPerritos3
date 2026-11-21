@@ -22,7 +22,7 @@ export interface Producto {
 export class ProductoService {
 
     private readonly apiUrl =
-        'http://localhost:8080/api/productos';
+        'http://localhost:8082/api/productos';
 
 
     constructor(

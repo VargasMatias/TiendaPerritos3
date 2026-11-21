@@ -12,10 +12,11 @@ import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfigur
 import org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.EnableKafka;
-
+import org.springframework.context.annotation.Profile;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+@Profile("kafka-demo")
 @SpringBootApplication(
     scanBasePackages = "cl.duoc.tiendaperritos.product_service.kafka",
     exclude = {

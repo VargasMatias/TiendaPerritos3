@@ -2,3 +2,8 @@
 # Logs temporales de Spring Boot
 backend-spring/product-service/spring-*.log
 **/target/
+.env
+.env.*
+*.pem
+*.p12
+*.pfx

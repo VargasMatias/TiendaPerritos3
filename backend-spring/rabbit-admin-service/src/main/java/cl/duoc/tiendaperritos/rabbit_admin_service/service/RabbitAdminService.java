@@ -149,4 +149,34 @@ public class RabbitAdminService {
                         + request.routingKey()
         );
     }
+        public void eliminarBinding(BindingRequest request) {
+
+        Queue queue = new Queue(
+                request.queue(),
+                true
+        );
+
+        DirectExchange exchange = new DirectExchange(
+                request.exchange(),
+                true,
+                false
+        );
+
+        Binding binding = BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with(request.routingKey());
+
+        amqpAdmin.removeBinding(binding);
+
+        System.out.println(
+                "[RABBIT ADMIN] Solicitud de eliminación de binding: "
+                        + request.exchange()
+                        + " -> "
+                        + request.queue()
+                        + " routingKey="
+                        + request.routingKey()
+        );
+        }
+
 }

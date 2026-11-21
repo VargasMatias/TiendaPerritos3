@@ -1,0 +1,52 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    mem_limit: 900m
+    command:
+      - "--innodb-buffer-pool-size=128M"
+      - "--max-connections=40"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?required}
+      MYSQL_DATABASE: tienda_perritos
+      MYSQL_USER: tiendaperritos
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?required}
+    ports:
+      - "127.0.0.1:13306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+  rabbit1:
+    image: rabbitmq:4.1.8-management
+    hostname: rabbit1
+    restart: unless-stopped
+    mem_limit: 850m
+    environment:
+      RABBITMQ_DEFAULT_USER: tiendaperritos
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?required}
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:?required}
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - rabbit1-data:/var/lib/rabbitmq
+
+  rabbit2:
+    image: rabbitmq:4.1.8-management
+    hostname: rabbit2
+    restart: unless-stopped
+    mem_limit: 850m
+    environment:
+      RABBITMQ_DEFAULT_USER: tiendaperritos
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?required}
+      RABBITMQ_ERLANG_COOKIE: ${RABBITMQ_ERLANG_COOKIE:?required}
+    ports:
+      - "127.0.0.1:5673:5672"
+    volumes:
+      - rabbit2-data:/var/lib/rabbitmq
+
+volumes:
+  mysql-data:
+  rabbit1-data:
+  rabbit2-data:
