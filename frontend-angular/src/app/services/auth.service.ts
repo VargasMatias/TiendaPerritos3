@@ -13,7 +13,7 @@ export class AuthService {
         'k8bjsh3eem7jd11180kepd9qb';
 
     private readonly redirectUri =
-        'http://localhost:4200';
+        window.location.origin;
 
     private readonly scopes =
         'openid email profile';

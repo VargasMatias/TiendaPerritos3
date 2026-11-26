@@ -170,11 +170,7 @@ public class SecurityConfig {
         CorsConfiguration configuration =
             new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-            List.of(
-                "http://localhost:4200"
-            )
-        );
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "https://3-82-127-20.sslip.io"));
 
         configuration.setAllowedMethods(
             List.of(

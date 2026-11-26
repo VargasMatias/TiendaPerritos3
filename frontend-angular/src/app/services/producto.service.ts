@@ -22,7 +22,7 @@ export interface Producto {
 export class ProductoService {
 
     private readonly apiUrl =
-        'http://localhost:8082/api/productos';
+        'https://zfy6elivod.execute-api.us-east-1.amazonaws.com/api/productos';
 
 
     constructor(
